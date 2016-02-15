@@ -2,7 +2,7 @@
 
 #include "system/window.h"
 #include "math/vector2d.h"
-#include "system/allocator.h"
+#include "system/resource.h"
 
 void shutdown(Game::Window& window)
 {
@@ -14,7 +14,7 @@ int main()
 {
     std::cout << "Hello world!\n";
 
-    Game::Allocator resourceBuffer;
+    Game::ResourceManager resourceBuffer;
 
     if (resourceBuffer.initialize(256) == false)
     {
@@ -35,11 +35,18 @@ int main()
         return 1;
     }
 
-    auto one = resourceBuffer.allocate(Game::Vector2D({10.0f, 20.0f}));
-    auto two = resourceBuffer.allocate(Game::Vector2D({9.0f, 19.0f}));
+    auto one = resourceBuffer.allocateResource("Vector1", Game::ResourceType::DATA, Game::Vector2D({10.0f, 20.0f}));
+    auto two = resourceBuffer.allocateResource("Vector2", Game::ResourceType::DATA, Game::Vector2D({9.0f, 19.0f}));
 
-    std::cout << "Vector at " << one << " is " << one->x << ", " << one->y << "\n";
-    std::cout << "Vector at " << two << " is " << two->x << ", " << two->y << "\n";
+    auto rawOne = static_cast<Game::Vector2D*>(one.getData());
+    auto rawTwo = static_cast<Game::Vector2D*>(two.getData());
+
+    std::cout << "Vector at " << rawOne << " is " << rawOne->x << ", " << rawOne->y << "\n";
+    std::cout << "Vector at " << rawTwo << " is " << rawTwo->x << ", " << rawTwo->y << "\n";
+
+    resourceBuffer.reset();
+
+    std::cout << "Vectors are now " << static_cast<int>(one.getType()) << "\n";
 
     SDL_Delay(3000);
 

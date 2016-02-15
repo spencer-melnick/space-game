@@ -1,21 +1,27 @@
 #pragma once
 
-/*TODO: Make resource handle list using pool allocator:
-Each resource handle is held in a pool allocator, and keeps number of
-references to it - akin to smart pointers - when it's resource is
-removed, then it is no longer valid, and when there are no more references
-to the handle, it is freed */
+/*TODO: make Resource::_headers use pool allocator (potentially)
+ * make Resource::allocate check for duplicate GIDs
+ * use templated ResourceHandles to make safer type casting?
+*/
 
-#include <list>
+#include <forward_list>
 
 #include "stackallocator.h"
 
+#define KiB 1024
+#define MiB 1024 * KiB
+
 namespace Game
 {
+    class ResourceHandle;
+    class ResourceManager;
+
     enum class ResourceType
     {
         INVALID,
-        TEXTURE
+        TEXTURE,
+        DATA
     };
 
     struct Resource
@@ -24,10 +30,10 @@ namespace Game
         size_t gid = 0;
         unsigned int references = 0;
 
-        ResourceType type = INVALID;
+        ResourceType type = ResourceType::INVALID;
         void* data = nullptr;
-        ResourceManager = nullptr;
-    }
+        ResourceManager* owner = nullptr;
+    };
 
     class ResourceHandle
     {
@@ -50,6 +56,8 @@ namespace Game
 
     class ResourceManager
     {
+        friend class ResourceHandle;
+
         public:
             bool initialize(const size_t bytes); //returns false on bad allocation or if already allocated
 
@@ -70,7 +78,7 @@ namespace Game
 
 
     template <typename T>
-    ResourceHandle allocateResource(const std::string& filename, const ResourceType type, const T& resource)
+    ResourceHandle ResourceManager::allocateResource(const std::string& filename, const ResourceType type, const T& resource)
     {
         Resource header;
         header.gid = hashString(filename);
@@ -84,7 +92,8 @@ namespace Game
         header.type = type;
 
         _headers.push_front(header);
+        Resource* bufferedHeader = &(_headers.front());
 
-        return ResourceHandle(header, this);
+        return ResourceHandle(bufferedHeader, this);
     }
 }

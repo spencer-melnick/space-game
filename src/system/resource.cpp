@@ -39,7 +39,7 @@ ResourceType ResourceHandle::getType() const
     if (_resource != nullptr)
         return _resource->type;
 
-    return ResourceType::INVALID
+    return ResourceType::INVALID;
 }
 
 bool ResourceHandle::isValid() const
@@ -60,7 +60,7 @@ size_t ResourceHandle::getGid() const
     if (isValid())
         return _resource->gid;
 
-    return nullptr;
+    return 0;
 }
 
 bool ResourceManager::initialize(const size_t bytes)
@@ -70,5 +70,32 @@ bool ResourceManager::initialize(const size_t bytes)
 
 void ResourceManager::deallocate(const size_t marker)
 {
+    _mainbuffer.deallocate(marker);
 
+    for (auto i : _headers)
+    {
+        if (i.marker > marker)
+        {
+            i.marker = 0;
+            i.type = ResourceType::INVALID;
+            i.data = nullptr;
+        }
+    }
+
+    _headers.remove_if([](const Resource& resource){return resource.references == 0;});
+}
+
+void ResourceManager::reset()
+{
+    deallocate(0);
+}
+
+size_t ResourceManager::hashString(const std::string& filename)
+{
+    return getHash()(filename);
+}
+
+void ResourceManager::clearHandle(const Resource& resource)
+{
+    _headers.remove_if([&resource](const Resource& i){return &(resource) == &(i);});
 }

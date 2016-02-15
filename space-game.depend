@@ -1,0 +1,41 @@
+# depslib dependency file v1.0
+1455572085 source:/home/spencer/Projects/Learning/space-game/src/main.cpp
+	<iostream>
+	"system/window.h"
+	"math/vector2d.h"
+	"system/resource.h"
+
+1454811489 source:/home/spencer/Projects/Learning/space-game/src/system/window.cpp
+	"window.h"
+
+1454792862 /home/spencer/Projects/Learning/space-game/src/system/window.h
+	<SDL2/SDL.h>
+	<string>
+
+1455048054 source:/home/spencer/Projects/Learning/space-game/src/math/vector2d.cpp
+	"vector2d.h"
+
+1455048041 /home/spencer/Projects/Learning/space-game/src/math/vector2d.h
+	<math.h>
+
+1455571622 source:/home/spencer/Projects/Learning/space-game/src/system/resource.cpp
+	"resource.h"
+
+1455572073 /home/spencer/Projects/Learning/space-game/src/system/resource.h
+	<forward_list>
+	"stackallocator.h"
+
+1455048822 /home/spencer/Projects/Learning/space-game/src/system/allocator.h
+	<memory>
+	<new>
+
+1455048754 source:/home/spencer/Projects/Learning/space-game/src/system/allocator.cpp
+	"allocator.h"
+
+1455310588 /home/spencer/Projects/Learning/space-game/src/system/stackallocator.h
+	<memory>
+	<new>
+
+1455310621 source:/home/spencer/Projects/Learning/space-game/src/system/stackallocator.cpp
+	"stackallocator.h"
+
