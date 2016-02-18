@@ -72,17 +72,17 @@ void ResourceManager::deallocate(const size_t marker)
 {
     _mainbuffer.deallocate(marker);
 
-    for (auto i : _headers)
+    for (auto i = _headers.begin(); i != _headers.end();  i++)
     {
-        if (i.marker > marker)
+        if (i->marker > marker)
         {
-            i.marker = 0;
-            i.type = ResourceType::INVALID;
-            i.data = nullptr;
+            i->marker = 0;
+            i->type = ResourceType::INVALID;
+            i->data = nullptr;
         }
     }
 
-    _headers.remove_if([](const Resource& resource){return resource.references == 0;});
+    _headers.remove_if([](const Resource& resource){return (resource.references == 0 && resource.data == nullptr);});
 }
 
 void ResourceManager::reset()
