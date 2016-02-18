@@ -29,7 +29,7 @@ ResourceHandle::~ResourceHandle()
     {
         _resource->references --;
 
-        if (_resource->references == 0 && _owner != nullptr)
+        if (_resource->references == 0 && _resource->data == nullptr && _owner != nullptr)
             _owner->clearHandle(*_resource);
     }
 }
