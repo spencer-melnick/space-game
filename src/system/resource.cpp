@@ -72,13 +72,13 @@ void ResourceManager::deallocate(const size_t marker)
 {
     _mainbuffer.deallocate(marker);
 
-    for (auto i = _headers.begin(); i != _headers.end();  i++)
+    for (auto& i : _headers)
     {
-        if (i->marker > marker)
+        if (i.marker > marker)
         {
-            i->marker = 0;
-            i->type = ResourceType::INVALID;
-            i->data = nullptr;
+            i.marker = 0;
+            i.type = ResourceType::INVALID;
+            i.data = nullptr;
         }
     }
 
