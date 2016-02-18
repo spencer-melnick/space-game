@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1455822946 source:/home/spencer/Projects/Learning/space-game/src/main.cpp
+1455824576 source:/home/spencer/Projects/Learning/space-game/src/main.cpp
 	<iostream>
 	"system/window.h"
 	"math/vector2d.h"
@@ -18,11 +18,10 @@
 1455048041 /home/spencer/Projects/Learning/space-game/src/math/vector2d.h
 	<math.h>
 
-1455823096 source:/home/spencer/Projects/Learning/space-game/src/system/resource.cpp
+1455824588 source:/home/spencer/Projects/Learning/space-game/src/system/resource.cpp
 	"resource.h"
-	<iostream>
 
-1455823458 /home/spencer/Projects/Learning/space-game/src/system/resource.h
+1455824186 /home/spencer/Projects/Learning/space-game/src/system/resource.h
 	<forward_list>
 	"stackallocator.h"
 

@@ -90,6 +90,16 @@ void ResourceManager::reset()
     deallocate(0);
 }
 
+size_t ResourceManager::getNumberResources()
+{
+    size_t numElements = 0;
+
+    for (auto i = _headers.begin(); i != _headers.end(); i++)
+        numElements ++;
+
+    return numElements;
+}
+
 size_t ResourceManager::hashString(const std::string& filename)
 {
     return getHash()(filename);

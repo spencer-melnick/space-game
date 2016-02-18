@@ -67,6 +67,8 @@ namespace Game
             void deallocate(const size_t marker);
             void reset();
 
+            size_t getNumberResources();
+
         protected:
             static size_t hashString(const std::string& filename);
             void clearHandle(const Resource& resource);

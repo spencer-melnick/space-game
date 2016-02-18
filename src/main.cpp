@@ -35,18 +35,28 @@ int main()
         return 1;
     }
 
-    auto one = resourceBuffer.allocateResource("Vector1", Game::ResourceType::DATA, Game::Vector2D({10.0f, 20.0f}));
-    auto two = resourceBuffer.allocateResource("Vector2", Game::ResourceType::DATA, Game::Vector2D({9.0f, 19.0f}));
+    {
+        std::cout << resourceBuffer.getNumberResources() << " resources headers stored\n";
 
-    auto rawOne = static_cast<Game::Vector2D*>(one.getData());
-    auto rawTwo = static_cast<Game::Vector2D*>(two.getData());
+        auto one = resourceBuffer.allocateResource("Vector1", Game::ResourceType::DATA, Game::Vector2D({10.0f, 20.0f}));
+        auto two = resourceBuffer.allocateResource("Vector2", Game::ResourceType::DATA, Game::Vector2D({9.0f, 19.0f}));
 
-    std::cout << "Vector at " << rawOne << " is " << rawOne->x << ", " << rawOne->y << "\n";
-    std::cout << "Vector at " << rawTwo << " is " << rawTwo->x << ", " << rawTwo->y << "\n";
+        auto rawOne = static_cast<Game::Vector2D*>(one.getData());
+        auto rawTwo = static_cast<Game::Vector2D*>(two.getData());
 
-    resourceBuffer.reset();
+        std::cout << "Vectors are now " << ((one.isValid()) ? "valid" : "invalid") << "\n";
 
-    std::cout << "Vectors are now " << static_cast<int>(one.getType()) << "\n";
+        std::cout << "Vector at " << rawOne << " is " << rawOne->x << ", " << rawOne->y << "\n";
+        std::cout << "Vector at " << rawTwo << " is " << rawTwo->x << ", " << rawTwo->y << "\n";
+
+        resourceBuffer.reset();
+
+        std::cout << "Vectors are now " << ((one.isValid()) ? "valid" : "invalid") << "\n";
+
+        std::cout << resourceBuffer.getNumberResources() << " resources headers stored\n";
+    }
+
+    std::cout << resourceBuffer.getNumberResources() << " resources headers stored\n";
 
     SDL_Delay(3000);
 
