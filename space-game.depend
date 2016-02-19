@@ -1,17 +1,18 @@
 # depslib dependency file v1.0
-1455914125 source:/home/spencer/Projects/Learning/space-game/src/main.cpp
+1455917270 source:/home/spencer/Projects/Learning/space-game/src/main.cpp
 	<iostream>
+	<type_traits>
 	"system/window.h"
 	"math/vector2d.h"
 	"system/resource.h"
 	"graphics/texture.h"
 
-1454811489 source:/home/spencer/Projects/Learning/space-game/src/system/window.cpp
+1455918938 source:/home/spencer/Projects/Learning/space-game/src/system/window.cpp
 	"window.h"
 
-1454792862 /home/spencer/Projects/Learning/space-game/src/system/window.h
-	<SDL2/SDL.h>
+1455918215 /home/spencer/Projects/Learning/space-game/src/system/window.h
 	<string>
+	<SDL2/SDL.h>
 
 1455048054 source:/home/spencer/Projects/Learning/space-game/src/math/vector2d.cpp
 	"vector2d.h"
@@ -40,6 +41,11 @@
 1455310621 source:/home/spencer/Projects/Learning/space-game/src/system/stackallocator.cpp
 	"stackallocator.h"
 
-1455913588 /home/spencer/Projects/Learning/space-game/src/graphics/texture.h
+1455918197 /home/spencer/Projects/Learning/space-game/src/graphics/texture.h
+	<string>
+	<SDL2/SDL.h>
 	"../math/vector2d.h"
+
+1455918171 source:/home/spencer/Projects/Learning/space-game/src/graphics/texture.cpp
+	"texture.h"
 

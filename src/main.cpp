@@ -1,4 +1,5 @@
 #include <iostream>
+#include <type_traits>
 
 #include "system/window.h"
 #include "math/vector2d.h"
