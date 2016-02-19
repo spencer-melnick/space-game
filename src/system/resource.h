@@ -48,6 +48,7 @@ namespace Game
 
             void* getData() const;
             size_t getGid() const;
+            size_t getMarker() const; //returns marker to after this resource
 
         protected:
             ResourceHeader* _resource;
@@ -61,6 +62,9 @@ namespace Game
         public:
             bool initialize(const size_t bytes); //returns false on bad allocation or if already allocated
 
+            template <typename t>
+            ResourceHandle allocateResource(const std::string& name, const ResourceType);
+
             template <typename T>
             ResourceHandle allocateResource(const std::string& name, const ResourceType type, const T& resource);
 
@@ -68,10 +72,12 @@ namespace Game
             ResourceHandle allocateRawResources(const std::string& name, size_t number);
             //allocates an array of T as a single resource with a specific GID
 
-            void deallocate(const size_t marker);
+            void deallocateTo(const size_t marker);
             void reset();
 
             size_t getNumberResources();
+            ResourceHandle getResource(const size_t gid);
+            ResourceHandle getResource(const std::string& name);
 
         protected:
             static size_t hashString(const std::string& name);
@@ -83,6 +89,12 @@ namespace Game
             std::forward_list<ResourceHeader> _headers;
     };
 
+    template <typename T>
+    ResourceHandle ResourceBuffer::allocateResource(const std::string& name, const ResourceType type)
+    {
+        void* data = _mainbuffer.allocate(sizeof(T), alignof(T));
+        return pushHeader(name, type, _mainbuffer.getMarker(), data);
+    }
 
     template <typename T>
     ResourceHandle ResourceBuffer::allocateResource(const std::string& name, const ResourceType type, const T& resource)

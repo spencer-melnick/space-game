@@ -15,6 +15,9 @@ namespace Game
             void reset();
 
             template <typename T>
+            T* allocate();
+
+            template <typename T>
             T* allocate(const T& val);
 
         protected:
@@ -28,6 +31,22 @@ namespace Game
 
 
 
+
+    template <typename T>
+    T* StackAllocator::allocate()
+    {
+        void* address = allocate(sizeof(T), alignof(T));
+
+        if (address != nullptr)
+        {
+            T* data = new(address) T();
+
+            if (data != nullptr)
+                return data;
+        }
+
+        return nullptr;
+    }
 
     template <typename T>
     T* StackAllocator::allocate(const T& val)

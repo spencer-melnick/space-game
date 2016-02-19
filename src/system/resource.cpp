@@ -63,12 +63,20 @@ size_t ResourceHandle::getGid() const
     return 0;
 }
 
+size_t ResourceHandle::getMarker() const
+{
+    if (isValid())
+        return _resource->marker;
+
+    return 0;
+}
+
 bool ResourceBuffer::initialize(const size_t bytes)
 {
     return _mainbuffer.initialize(bytes);
 }
 
-void ResourceBuffer::deallocate(const size_t marker)
+void ResourceBuffer::deallocateTo(const size_t marker)
 {
     _mainbuffer.deallocate(marker);
 
@@ -87,7 +95,7 @@ void ResourceBuffer::deallocate(const size_t marker)
 
 void ResourceBuffer::reset()
 {
-    deallocate(0);
+    deallocateTo(0);
 }
 
 size_t ResourceBuffer::getNumberResources()
@@ -98,6 +106,22 @@ size_t ResourceBuffer::getNumberResources()
         numElements ++;
 
     return numElements;
+}
+
+ResourceHandle ResourceBuffer::getResource(const size_t gid)
+{
+    for (auto& i : _headers)
+    {
+        if (i.gid == gid)
+            return ResourceHandle(&i, this);
+    }
+
+    return ResourceHandle();
+}
+
+ResourceHandle ResourceBuffer::getResource(const std::string& name)
+{
+    return getResource(hashString(name));
 }
 
 size_t ResourceBuffer::hashString(const std::string& name)

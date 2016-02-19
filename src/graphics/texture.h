@@ -8,5 +8,5 @@ namespace Game
     {
         SDL_Texture* textureSdl;
         Vector2D dimensions;
-    }
+    };
 }
