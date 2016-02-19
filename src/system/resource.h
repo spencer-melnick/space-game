@@ -15,16 +15,16 @@
 namespace Game
 {
     class ResourceHandle;
-    class ResourceManager;
+    class ResourceBuffer;
 
     enum class ResourceType
     {
         INVALID,
-        TEXTURE,
-        DATA
+        RAW_MEM,
+        TEXTURE
     };
 
-    struct Resource
+    struct ResourceHeader
     {
         size_t marker = 0;
         size_t gid = 0;
@@ -32,14 +32,14 @@ namespace Game
 
         ResourceType type = ResourceType::INVALID;
         void* data = nullptr;
-        ResourceManager* owner = nullptr;
+        ResourceBuffer* owner = nullptr;
     };
 
     class ResourceHandle
     {
         public:
             ResourceHandle();
-            ResourceHandle(Resource* resource, ResourceManager* owner);
+            ResourceHandle(ResourceHeader* resource, ResourceBuffer* owner);
             ResourceHandle(const ResourceHandle& handle);
             ~ResourceHandle();
 
@@ -50,11 +50,11 @@ namespace Game
             size_t getGid() const;
 
         protected:
-            Resource* _resource;
-            ResourceManager* _owner;
+            ResourceHeader* _resource;
+            ResourceBuffer* _owner;
     };
 
-    class ResourceManager
+    class ResourceBuffer
     {
         friend class ResourceHandle;
 
@@ -62,7 +62,11 @@ namespace Game
             bool initialize(const size_t bytes); //returns false on bad allocation or if already allocated
 
             template <typename T>
-            ResourceHandle allocateResource(const std::string& filename, const ResourceType type, const T& resource);
+            ResourceHandle allocateResource(const std::string& name, const ResourceType type, const T& resource);
+
+            template <typename T>
+            ResourceHandle allocateRawResources(const std::string& name, size_t number);
+            //allocates an array of T as a single resource with a specific GID
 
             void deallocate(const size_t marker);
             void reset();
@@ -70,32 +74,27 @@ namespace Game
             size_t getNumberResources();
 
         protected:
-            static size_t hashString(const std::string& filename);
-            void clearHandle(const Resource& resource);
+            static size_t hashString(const std::string& name);
+            void clearHandle(const ResourceHeader& resource);
+            ResourceHandle pushHeader(const std::string& name, const ResourceType type, const size_t marker, void* data);
 
         private:
             StackAllocator _mainbuffer;
-            std::forward_list<Resource> _headers;
+            std::forward_list<ResourceHeader> _headers;
     };
 
 
     template <typename T>
-    ResourceHandle ResourceManager::allocateResource(const std::string& filename, const ResourceType type, const T& resource)
+    ResourceHandle ResourceBuffer::allocateResource(const std::string& name, const ResourceType type, const T& resource)
     {
-        Resource header;
-        header.gid = hashString(filename);
+        void* data = _mainbuffer.allocate(resource);
+        return pushHeader(name, type, _mainbuffer.getMarker(), data);
+    }
 
-        header.data = _mainbuffer.allocate(resource);
-
-        if (header.data == nullptr)
-            return ResourceHandle();
-
-        header.marker = _mainbuffer.getMarker();
-        header.type = type;
-
-        _headers.push_front(header);
-        Resource* bufferedHeader = &(_headers.front());
-
-        return ResourceHandle(bufferedHeader, this);
+    template <typename T>
+    ResourceHandle ResourceBuffer::allocateRawResources(const std::string& name, size_t number)
+    {
+        void* data = _mainbuffer.allocate(sizeof(T) * number, alignof(T));
+        return pushHeader(name, ResourceType::RAW_MEM, _mainbuffer.getMarker(), data);
     }
 }

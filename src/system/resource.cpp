@@ -12,7 +12,7 @@ ResourceHandle::ResourceHandle() :
     _resource(nullptr), _owner(nullptr)
 {}
 
-ResourceHandle::ResourceHandle(Resource* resource, ResourceManager* owner) :
+ResourceHandle::ResourceHandle(ResourceHeader* resource, ResourceBuffer* owner) :
     _owner(owner)
 {
     resource->references ++;
@@ -63,12 +63,12 @@ size_t ResourceHandle::getGid() const
     return 0;
 }
 
-bool ResourceManager::initialize(const size_t bytes)
+bool ResourceBuffer::initialize(const size_t bytes)
 {
     return _mainbuffer.initialize(bytes);
 }
 
-void ResourceManager::deallocate(const size_t marker)
+void ResourceBuffer::deallocate(const size_t marker)
 {
     _mainbuffer.deallocate(marker);
 
@@ -82,15 +82,15 @@ void ResourceManager::deallocate(const size_t marker)
         }
     }
 
-    _headers.remove_if([](const Resource& resource){return (resource.references == 0 && resource.data == nullptr);});
+    _headers.remove_if([](const ResourceHeader& resource){return (resource.references == 0 && resource.data == nullptr);});
 }
 
-void ResourceManager::reset()
+void ResourceBuffer::reset()
 {
     deallocate(0);
 }
 
-size_t ResourceManager::getNumberResources()
+size_t ResourceBuffer::getNumberResources()
 {
     size_t numElements = 0;
 
@@ -100,12 +100,30 @@ size_t ResourceManager::getNumberResources()
     return numElements;
 }
 
-size_t ResourceManager::hashString(const std::string& filename)
+size_t ResourceBuffer::hashString(const std::string& name)
 {
-    return getHash()(filename);
+    return getHash()(name);
 }
 
-void ResourceManager::clearHandle(const Resource& resource)
+void ResourceBuffer::clearHandle(const ResourceHeader& resource)
 {
-    _headers.remove_if([&resource](const Resource& i){return &(resource) == &(i);});
+    _headers.remove_if([&resource](const ResourceHeader& i){return &(resource) == &(i);});
+}
+
+ResourceHandle ResourceBuffer::pushHeader(const std::string& name, const ResourceType type, const size_t marker, void* data)
+{
+    if (data == nullptr)
+        return ResourceHandle();
+
+    ResourceHeader header;
+
+    header.gid = hashString(name);
+    header.data = data;
+    header.marker = marker;
+    header.type = type;
+
+    _headers.push_front(header);
+    ResourceHeader* bufferedHeader = &(_headers.front());
+
+    return ResourceHandle(bufferedHeader, this);
 }

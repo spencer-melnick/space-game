@@ -14,7 +14,7 @@ int main()
 {
     std::cout << "Hello world!\n";
 
-    Game::ResourceManager resourceBuffer;
+    Game::ResourceBuffer resourceBuffer;
 
     if (resourceBuffer.initialize(256) == false)
     {
@@ -38,9 +38,9 @@ int main()
     {
         std::cout << resourceBuffer.getNumberResources() << " resources headers stored\n";
 
-        auto one = resourceBuffer.allocateResource("Vector1", Game::ResourceType::DATA, Game::Vector2D({10.0f, 20.0f}));
+        auto one = resourceBuffer.allocateResource("Vector1", Game::ResourceType::TEXTURE, Game::Vector2D({10.0f, 20.0f}));
         std::cout << resourceBuffer.getNumberResources() << " resources headers stored\n";
-        resourceBuffer.allocateResource("Vector2", Game::ResourceType::DATA, Game::Vector2D({9.0f, 19.0f}));
+        resourceBuffer.allocateResource("Vector2", Game::ResourceType::TEXTURE, Game::Vector2D({9.0f, 19.0f}));
         std::cout << resourceBuffer.getNumberResources() << " resources headers stored\n";
 
         auto rawOne = static_cast<Game::Vector2D*>(one.getData());
