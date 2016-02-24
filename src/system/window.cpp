@@ -33,11 +33,16 @@ Window::ErrorCode Window::initialize(const Config config)
     _surfaceSdl = SDL_GetWindowSurface(_windowSdl);
     _rendererSdl = SDL_CreateRenderer(_windowSdl, -1, RENDERER_FLAGS);
 
-    /*if (_rendererSdl == nullptr)
+    if (_rendererSdl == nullptr)
     {
         destroy();
         return ErrorCode::RENDERER_CREATION_FAILURE;
-    }*/
+    }
+
+    if (IMG_Init(IMAGE_FLAGS) != IMAGE_FLAGS)
+    {
+        //error
+    }
 
     return ErrorCode::NO_ERROR;
 }

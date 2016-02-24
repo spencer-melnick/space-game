@@ -35,6 +35,7 @@
 		</Compiler>
 		<Linker>
 			<Add library="SDL2" />
+			<Add library="SDL2_Image" />
 		</Linker>
 		<Unit filename="src/graphics/sprite.h" />
 		<Unit filename="src/graphics/texture.cpp" />

@@ -3,8 +3,10 @@
 #include <string>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #define RENDERER_FLAGS SDL_RENDERER_ACCELERATED
+#define IMAGE_FLAGS (IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF)
 
 namespace Game
 {
