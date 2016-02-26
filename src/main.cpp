@@ -8,12 +8,6 @@
 
 using namespace Game;
 
-void shutdown(Window& window)
-{
-    window.destroy();
-    SDL_Quit();
-}
-
 int main()
 {
     std::cout << "Hello world!\n";
@@ -34,7 +28,6 @@ int main()
     if (error != Window::ErrorCode::NO_ERROR)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", Window::getErrorString(error).c_str(), nullptr);
-        shutdown(window);
 
         return 1;
     }
@@ -42,9 +35,19 @@ int main()
     auto textureHandle1 = resourceBuffer.allocateResource<Texture>("Texture1", ResourceType::TEXTURE);
     auto textureHandle2 = resourceBuffer.allocateResource<Texture>("Texture2", ResourceType::TEXTURE);
 
+    auto texture1 = static_cast<Texture*>(textureHandle1.getData());
+    Texture::ErrorCode loadError = texture1->loadFromFile("./rc/texture.png", window.getSdlRenderer());
+
+    if (loadError != Texture::ErrorCode::NO_ERROR)
+        std::cout << "\"./rc/texture.png\" failed to load\n";
+    else
+        SDL_RenderCopy(window.getSdlRenderer(), texture1->textureSdl, nullptr, nullptr);
+
+    SDL_RenderPresent(window.getSdlRenderer());
+
     SDL_Delay(3000);
 
-    shutdown(window);
+    window.destroy();
 
     return 0;
 }

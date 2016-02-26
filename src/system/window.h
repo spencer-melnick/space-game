@@ -25,14 +25,15 @@ namespace Game
             enum class ErrorCode
             {
                 NO_ERROR,
-                VIDEO_INIT_FAILURE,
+                SDL_INIT_FAILURE,
                 WINDOW_CREATION_FAILURE,
-                RENDERER_CREATION_FAILURE
+                RENDERER_CREATION_FAILURE,
+                IMAGE_INIT_FAILURE
             };
 
             static std::string getErrorString(const ErrorCode error);
             ErrorCode initialize(const Config config);
-            const SDL_Renderer* getSdlRenderer() const;
+            SDL_Renderer* getSdlRenderer() const;
             void destroy();
 
         private:

@@ -1,0 +1,4 @@
+TODO:
+
+Add some system for properly freeing texture resources
+Add some templated type casting for resources
