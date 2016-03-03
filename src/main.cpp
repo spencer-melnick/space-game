@@ -33,7 +33,7 @@ int main()
     }
 
     auto textureHandle1 = resourceBuffer.allocateResource<Texture>("Texture1");
-    auto textureHandle2 = resourceBuffer.allocateResource<Texture>("Texture2");
+    auto textureHandle2 = resourceBuffer.allocateResourceArray<Texture>("TextureBuffer", 12);
 
     auto texture1 = textureHandle1.getData<Texture>();
     Texture::ErrorCode loadError = texture1->loadFromFile("./rc/texture.png", window.getSdlRenderer());
@@ -47,6 +47,7 @@ int main()
 
     SDL_Delay(3000);
 
+    resourceBuffer.reset();
     window.destroy();
 
     return 0;

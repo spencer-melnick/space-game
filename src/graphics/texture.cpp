@@ -2,6 +2,8 @@
 
 using namespace Game;
 
+ResourceType Texture::resourceType = ResourceType::TEXTURE;
+
 Texture::ErrorCode Texture::loadFromFile(const std::string& filename, SDL_Renderer* renderer)
 {
     if (renderer == nullptr)
@@ -25,4 +27,18 @@ Texture::ErrorCode Texture::loadFromFile(const std::string& filename, SDL_Render
     dimensions.y = static_cast<float>(h);
 
     return ErrorCode::NO_ERROR;
+}
+
+void Texture::deallocate(void* data, size_t elements)
+{
+    Texture* texture = static_cast<Texture*>(data);
+    Texture* temp;
+
+    for (unsigned int i = 0; i < elements; i ++)
+    {
+        temp = texture + i;
+
+        if (temp->textureSdl != nullptr)
+            SDL_DestroyTexture(temp->textureSdl);
+    }
 }

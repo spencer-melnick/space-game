@@ -5,10 +5,13 @@
  */
 
 /*IMPORTANT:
- * A resource struct must have a ResourceType "resourceType" member variable
+ * A resource struct must have a static ResourceType "resourceType" member variable
+ * and a void "deallocate(void* data, size_t elements)" function
  */
 
 #include <forward_list>
+#include <map>
+#include <functional>
 
 #include "stackallocator.h"
 
@@ -23,7 +26,6 @@ namespace Game
     enum class ResourceType
     {
         INVALID,
-        RAW_MEM,
         TEXTURE
     };
 
@@ -53,6 +55,7 @@ namespace Game
             void* getData() const;
             size_t getGid() const;
             size_t getMarker() const; //returns marker to after this resource
+            size_t getNumberElements() const;
 
             template <typename T>
             T* getData();
@@ -76,7 +79,7 @@ namespace Game
             ResourceHandle allocateResource(const std::string& name, const T& resource);
 
             template <typename T>
-            ResourceHandle allocateRawResources(const std::string& name, size_t number);
+            ResourceHandle allocateResourceArray(const std::string& name, size_t number);
             //allocates an array of T as a single resource with a specific GID
 
             void deallocateTo(const size_t marker);
@@ -93,9 +96,13 @@ namespace Game
             ResourceHandle pushHeader(const std::string& name, const ResourceType type, const size_t marker,
                                         const size_t elements, void* data);
 
+            template <typename T>
+            void bindDeallocator();
+
         private:
             StackAllocator _mainbuffer;
             std::forward_list<ResourceHeader> _headers;
+            std::map<ResourceType, std::function<void(void*, size_t)> > _deallocators;
     };
 
 
@@ -112,21 +119,49 @@ namespace Game
     template <typename T>
     ResourceHandle ResourceBuffer::allocateResource(const std::string& name)
     {
-        void* data = _mainbuffer.allocate(sizeof(T), alignof(T));
-        return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), 1, data);
+        bindDeallocator<T>();
+
+        if (!getResource(name).isValid())
+        {
+            void* data = _mainbuffer.allocate(sizeof(T), alignof(T));
+            return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), 1, data);
+        }
+
+        return ResourceHandle();
     }
 
     template <typename T>
     ResourceHandle ResourceBuffer::allocateResource(const std::string& name, const T& resource)
     {
-        void* data = _mainbuffer.allocate(resource);
-        return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), 1, data);
+        bindDeallocator<T>();
+
+        if (!getResource(name).isValid())
+        {
+            void* data = _mainbuffer.allocate(resource);
+            return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), 1, data);
+        }
+
+        return ResourceHandle();
     }
 
     template <typename T>
-    ResourceHandle ResourceBuffer::allocateRawResources(const std::string& name, size_t number)
+    ResourceHandle ResourceBuffer::allocateResourceArray(const std::string& name, size_t number)
     {
-        void* data = _mainbuffer.allocate(sizeof(T) * number, alignof(T));
-        return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), number, data);
+        bindDeallocator<T>();
+
+        if (!getResource(name).isValid())
+        {
+            void* data = _mainbuffer.allocate(sizeof(T) * number, alignof(T));
+            return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), number, data);
+        }
+
+        return ResourceHandle();
+    }
+
+    template <typename T>
+    void ResourceBuffer::bindDeallocator()
+    {
+        if (_deallocators.find(T::resourceType) == _deallocators.end())
+            _deallocators[T::resourceType] = &T::deallocate;
     }
 }

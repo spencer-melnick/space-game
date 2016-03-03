@@ -24,8 +24,10 @@ namespace Game
             SDL_Texture* textureSdl = nullptr;
             Vector2D dimensions = {0.0, 0.0};
 
-
-            static const ResourceType resourceType = ResourceType::TEXTURE;
             ErrorCode loadFromFile(const std::string& filename, SDL_Renderer* renderer);
+
+            static ResourceType resourceType;
+
+            static void deallocate(void* data, size_t elements);
     };
 }

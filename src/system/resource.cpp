@@ -71,6 +71,14 @@ size_t ResourceHandle::getMarker() const
     return 0;
 }
 
+size_t ResourceHandle::getNumberElements() const
+{
+    if (isValid())
+        return _resource->elements;
+
+    return 0;
+}
+
 bool ResourceBuffer::initialize(const size_t bytes)
 {
     return _mainbuffer.initialize(bytes);
@@ -84,6 +92,11 @@ void ResourceBuffer::deallocateTo(const size_t marker)
     {
         if (i.marker > marker)
         {
+            auto deallocator = _deallocators.find(i.type);
+
+            if (deallocator != _deallocators.end())
+                deallocator->second(i.data, i.elements);
+
             i.marker = 0;
             i.type = ResourceType::INVALID;
             i.data = nullptr;
