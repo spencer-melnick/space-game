@@ -39,6 +39,8 @@ int main()
 
     SDL_Rect position({0, 0, texture1->dimensions.x, texture1->dimensions.y});
 
+    SDL_RenderClear(window.getSdlRenderer());
+
     if (loadError != Texture::ErrorCode::NO_ERROR)
         std::cout << "\"./rc/texture.png\" failed to load\n";
     else
