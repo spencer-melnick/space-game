@@ -41,7 +41,6 @@
 		<Unit filename="src/graphics/texture.cpp" />
 		<Unit filename="src/graphics/texture.h" />
 		<Unit filename="src/main.cpp" />
-		<Unit filename="src/math/vector2d.cpp" />
 		<Unit filename="src/math/vector2d.h" />
 		<Unit filename="src/system/resource.cpp" />
 		<Unit filename="src/system/resource.h" />

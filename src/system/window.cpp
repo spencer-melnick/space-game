@@ -71,10 +71,10 @@ void Window::destroy()
 
     if (_windowSdl != nullptr)
     {
-        SDL_DestroyWindow(_windowSdl);
+        //SDL_DestroyWindow(_windowSdl);
         _windowSdl = nullptr;
     }
 
     IMG_Quit();
-    SDL_Quit();
+    //SDL_Quit();
 }
