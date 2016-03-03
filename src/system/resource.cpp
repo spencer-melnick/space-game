@@ -134,7 +134,8 @@ void ResourceBuffer::clearHandle(const ResourceHeader& resource)
     _headers.remove_if([&resource](const ResourceHeader& i){return &(resource) == &(i);});
 }
 
-ResourceHandle ResourceBuffer::pushHeader(const std::string& name, const ResourceType type, const size_t marker, void* data)
+ResourceHandle ResourceBuffer::pushHeader(const std::string& name, const ResourceType type,
+                                            const size_t marker, const size_t number, void* data)
 {
     if (data == nullptr)
         return ResourceHandle();
@@ -143,6 +144,7 @@ ResourceHandle ResourceBuffer::pushHeader(const std::string& name, const Resourc
 
     header.gid = hashString(name);
     header.data = data;
+    header.elements = number;
     header.marker = marker;
     header.type = type;
 

@@ -21,10 +21,10 @@
 1455048041 /home/spencer/Projects/Learning/space-game/src/math/vector2d.h
 	<math.h>
 
-1455914131 source:/home/spencer/Projects/Learning/space-game/src/system/resource.cpp
+1456973333 source:/home/spencer/Projects/Learning/space-game/src/system/resource.cpp
 	"resource.h"
 
-1455914071 /home/spencer/Projects/Learning/space-game/src/system/resource.h
+1456973755 /home/spencer/Projects/Learning/space-game/src/system/resource.h
 	<forward_list>
 	"stackallocator.h"
 
@@ -42,11 +42,12 @@
 1455310621 source:/home/spencer/Projects/Learning/space-game/src/system/stackallocator.cpp
 	"stackallocator.h"
 
-1456523292 /home/spencer/Projects/Learning/space-game/src/graphics/texture.h
+1456973675 /home/spencer/Projects/Learning/space-game/src/graphics/texture.h
 	<string>
 	<SDL2/SDL.h>
 	<SDL2/SDL_image.h>
 	"../math/vector2d.h"
+	"../system/resource.h"
 
 1456523367 source:/home/spencer/Projects/Learning/space-game/src/graphics/texture.cpp
 	"texture.h"

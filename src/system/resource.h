@@ -2,8 +2,11 @@
 
 /*TODO: make Resource::_headers use pool allocator (potentially)
  * make Resource::allocate check for duplicate GIDs
- * use templated ResourceHandles to make safer type casting?
-*/
+ */
+
+/*IMPORTANT:
+ * A resource struct must have a ResourceType "resourceType" member variable
+ */
 
 #include <forward_list>
 
@@ -28,6 +31,7 @@ namespace Game
     {
         size_t marker = 0;
         size_t gid = 0;
+        size_t elements = 1;
         unsigned int references = 0;
 
         ResourceType type = ResourceType::INVALID;
@@ -50,6 +54,9 @@ namespace Game
             size_t getGid() const;
             size_t getMarker() const; //returns marker to after this resource
 
+            template <typename T>
+            T* getData();
+
         protected:
             ResourceHeader* _resource;
             ResourceBuffer* _owner;
@@ -63,10 +70,10 @@ namespace Game
             bool initialize(const size_t bytes); //returns false on bad allocation or if already allocated
 
             template <typename t>
-            ResourceHandle allocateResource(const std::string& name, const ResourceType);
+            ResourceHandle allocateResource(const std::string& name);
 
             template <typename T>
-            ResourceHandle allocateResource(const std::string& name, const ResourceType type, const T& resource);
+            ResourceHandle allocateResource(const std::string& name, const T& resource);
 
             template <typename T>
             ResourceHandle allocateRawResources(const std::string& name, size_t number);
@@ -82,31 +89,44 @@ namespace Game
         protected:
             static size_t hashString(const std::string& name);
             void clearHandle(const ResourceHeader& resource);
-            ResourceHandle pushHeader(const std::string& name, const ResourceType type, const size_t marker, void* data);
+
+            ResourceHandle pushHeader(const std::string& name, const ResourceType type, const size_t marker,
+                                        const size_t elements, void* data);
 
         private:
             StackAllocator _mainbuffer;
             std::forward_list<ResourceHeader> _headers;
     };
 
+
     template <typename T>
-    ResourceHandle ResourceBuffer::allocateResource(const std::string& name, const ResourceType type)
+    T* ResourceHandle::getData()
     {
-        void* data = _mainbuffer.allocate(sizeof(T), alignof(T));
-        return pushHeader(name, type, _mainbuffer.getMarker(), data);
+        if (isValid())
+            if (T::resourceType == _resource->type)
+                return static_cast<T*>(_resource->data);
+
+        return nullptr;
     }
 
     template <typename T>
-    ResourceHandle ResourceBuffer::allocateResource(const std::string& name, const ResourceType type, const T& resource)
+    ResourceHandle ResourceBuffer::allocateResource(const std::string& name)
+    {
+        void* data = _mainbuffer.allocate(sizeof(T), alignof(T));
+        return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), 1, data);
+    }
+
+    template <typename T>
+    ResourceHandle ResourceBuffer::allocateResource(const std::string& name, const T& resource)
     {
         void* data = _mainbuffer.allocate(resource);
-        return pushHeader(name, type, _mainbuffer.getMarker(), data);
+        return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), 1, data);
     }
 
     template <typename T>
     ResourceHandle ResourceBuffer::allocateRawResources(const std::string& name, size_t number)
     {
         void* data = _mainbuffer.allocate(sizeof(T) * number, alignof(T));
-        return pushHeader(name, ResourceType::RAW_MEM, _mainbuffer.getMarker(), data);
+        return pushHeader(name, T::resourceType, _mainbuffer.getMarker(), number, data);
     }
 }

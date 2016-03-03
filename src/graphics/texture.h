@@ -6,6 +6,7 @@
 #include <SDL2/SDL_image.h>
 
 #include "../math/vector2d.h"
+#include "../system/resource.h"
 
 namespace Game
 {
@@ -23,6 +24,8 @@ namespace Game
             SDL_Texture* textureSdl = nullptr;
             Vector2D dimensions = {0.0, 0.0};
 
+
+            static const ResourceType resourceType = ResourceType::TEXTURE;
             ErrorCode loadFromFile(const std::string& filename, SDL_Renderer* renderer);
     };
 }
