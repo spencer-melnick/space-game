@@ -33,15 +33,16 @@ int main()
     }
 
     auto textureHandle1 = resourceBuffer.allocateResource<Texture>("Texture1");
-    auto textureHandle2 = resourceBuffer.allocateResourceArray<Texture>("TextureBuffer", 12);
 
     auto texture1 = textureHandle1.getData<Texture>();
     Texture::ErrorCode loadError = texture1->loadFromFile("./rc/texture.png", window.getSdlRenderer());
 
+    SDL_Rect position({0, 0, texture1->dimensions.x, texture1->dimensions.y});
+
     if (loadError != Texture::ErrorCode::NO_ERROR)
         std::cout << "\"./rc/texture.png\" failed to load\n";
     else
-        SDL_RenderCopy(window.getSdlRenderer(), texture1->textureSdl, nullptr, nullptr);
+        SDL_RenderCopy(window.getSdlRenderer(), texture1->textureSdl, nullptr, &position);
 
     SDL_RenderPresent(window.getSdlRenderer());
 

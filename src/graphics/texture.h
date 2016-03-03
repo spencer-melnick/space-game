@@ -22,7 +22,7 @@ namespace Game
             };
 
             SDL_Texture* textureSdl = nullptr;
-            Vector2D dimensions = {0.0, 0.0};
+            Vector2D<int> dimensions = {0, 0};
 
             ErrorCode loadFromFile(const std::string& filename, SDL_Renderer* renderer);
 
