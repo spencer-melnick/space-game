@@ -13,6 +13,7 @@ namespace Game
             size_t getMarker() const; //returns the top of the buffer stack
             void deallocate(const size_t marker); //does not invalidate pointers to elements!
             void reset();
+            void destroy();
 
             template <typename T>
             T* allocate();

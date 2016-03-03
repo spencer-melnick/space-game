@@ -84,6 +84,7 @@ namespace Game
 
             void deallocateTo(const size_t marker);
             void reset();
+            void destroy();
 
             size_t getNumberResources();
             ResourceHandle getResource(const size_t gid);

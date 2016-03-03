@@ -48,7 +48,7 @@ int main()
 
     SDL_Delay(3000);
 
-    resourceBuffer.reset();
+    resourceBuffer.destroy();
     window.destroy();
 
     return 0;

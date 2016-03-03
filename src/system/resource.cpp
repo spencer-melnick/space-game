@@ -111,6 +111,12 @@ void ResourceBuffer::reset()
     deallocateTo(0);
 }
 
+void ResourceBuffer::destroy()
+{
+    reset();
+    _mainbuffer.destroy();
+}
+
 size_t ResourceBuffer::getNumberResources()
 {
     size_t numElements = 0;

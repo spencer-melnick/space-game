@@ -48,3 +48,11 @@ void StackAllocator::reset()
 {
     _top = 0;
 }
+
+void StackAllocator::destroy()
+{
+    reset();
+
+    if (_buffer != nullptr)
+        delete[](_buffer);
+}
