@@ -15,7 +15,7 @@ int main()
 
     ResourceBuffer resourceBuffer;
 
-    if (resourceBuffer.initialize(1 * KiB) == false)
+    if (resourceBuffer.initialize(1 * MiB, 20) == false)
     {
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", "Failed to allocate main resource buffer", nullptr);
         return 1;

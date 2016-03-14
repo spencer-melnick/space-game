@@ -104,7 +104,6 @@ namespace Game
                                 next = i->nextUsed;
                                 if (next == temp)
                                 {
-                                    auto d = temp->nextUsed;
                                     i->nextUsed = temp->nextUsed;
                                     temp->nextUsed = nullptr;
                                     break;

@@ -14,6 +14,7 @@
 #include <functional>
 
 #include "stackallocator.h"
+#include "pool.h"
 
 #define KiB 1024
 #define MiB 1024 * KiB
@@ -70,7 +71,7 @@ namespace Game
         friend class ResourceHandle;
 
         public:
-            bool initialize(const size_t bytes); //returns false on bad allocation or if already allocated
+            bool initialize(const size_t bytes, const size_t maxElements); //returns false on bad allocation or if already allocated
 
             template <typename t>
             ResourceHandle allocateResource(const std::string& name);
@@ -86,11 +87,14 @@ namespace Game
             void reset();
             void destroy();
 
-            size_t getNumberResources();
+            bool isInitialized() const;
+            size_t getNumberResources() const;
             ResourceHandle getResource(const size_t gid);
             ResourceHandle getResource(const std::string& name);
 
         protected:
+            using HeaderPool = ObjectPool<ResourceHeader>;
+
             static size_t hashString(const std::string& name);
             void clearHandle(const ResourceHeader& resource);
 
@@ -102,7 +106,8 @@ namespace Game
 
         private:
             StackAllocator _mainbuffer;
-            std::forward_list<ResourceHeader> _headers;
+            HeaderPool* _headers;
+            bool _initialized;
             std::map<ResourceType, std::function<void(void*, size_t)> > _deallocators;
     };
 

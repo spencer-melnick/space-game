@@ -79,31 +79,62 @@ size_t ResourceHandle::getNumberElements() const
     return 0;
 }
 
-bool ResourceBuffer::initialize(const size_t bytes)
+bool ResourceBuffer::initialize(const size_t bytes, const size_t maxElements)
 {
-    return _mainbuffer.initialize(bytes);
+    bool result = _mainbuffer.initialize(bytes);
+
+    if (result == true)
+    {
+        void* data = _mainbuffer.allocate(sizeof(HeaderPool::Object) * maxElements, alignof(HeaderPool::Object));
+
+        if (data == nullptr)
+        {
+            _mainbuffer.destroy();
+            return false;
+        }
+
+        _headers = new HeaderPool(static_cast<HeaderPool::Object*>(data), maxElements);
+    }
+
+    return result;
 }
 
 void ResourceBuffer::deallocateTo(const size_t marker)
 {
     _mainbuffer.deallocate(marker);
 
-    for (auto& i : _headers)
+    for (HeaderPool::Handle i = _headers->getUsedObjects(); i.isValid(); i = i.getNextObject())
     {
-        if (i.marker > marker)
+        auto j = i.getData();
+        if (j->marker > marker)
         {
-            auto deallocator = _deallocators.find(i.type);
+            auto deallocator = _deallocators.find(j->type);
 
             if (deallocator != _deallocators.end())
-                deallocator->second(i.data, i.elements);
+                deallocator->second(j->data, j->elements);
 
-            i.marker = 0;
-            i.type = ResourceType::INVALID;
-            i.data = nullptr;
+            j->marker = 0;
+            j->type = ResourceType::INVALID;
+            j->data = nullptr;
         }
     }
 
-    _headers.remove_if([](const ResourceHeader& resource){return (resource.references == 0 && resource.data == nullptr);});
+    auto i = _headers->getUsedObjects();
+    while (i.isValid())
+    {
+        auto j = i.getData();
+        if (j->references == 0 && j->data == nullptr)
+        {
+            auto temp = i;
+            i = i.getNextObject();
+            _headers->freeObject(temp);
+        }
+        else
+        {
+            i = i.getNextObject();
+        }
+    }
+    //_headers.remove_if([](const ResourceHeader& resource){return (resource.references == 0 && resource.data == nullptr);});
 }
 
 void ResourceBuffer::reset()
@@ -117,11 +148,16 @@ void ResourceBuffer::destroy()
     _mainbuffer.destroy();
 }
 
-size_t ResourceBuffer::getNumberResources()
+bool ResourceBuffer::isInitialized() const
+{
+    return _initialized;
+}
+
+size_t ResourceBuffer::getNumberResources() const
 {
     size_t numElements = 0;
 
-    for (auto i = _headers.begin(); i != _headers.end(); i++)
+    for (HeaderPool::Handle i = _headers->getUsedObjects(); i.isValid(); i = i.getNextObject())
         numElements ++;
 
     return numElements;
@@ -129,10 +165,11 @@ size_t ResourceBuffer::getNumberResources()
 
 ResourceHandle ResourceBuffer::getResource(const size_t gid)
 {
-    for (auto& i : _headers)
+    for (HeaderPool::Handle i = _headers->getUsedObjects(); i.isValid(); i = i.getNextObject())
     {
-        if (i.gid == gid)
-            return ResourceHandle(&i, this);
+        auto j = i.getData();
+        if (j->gid == gid)
+            return ResourceHandle(j, this);
     }
 
     return ResourceHandle();
@@ -150,7 +187,14 @@ size_t ResourceBuffer::hashString(const std::string& name)
 
 void ResourceBuffer::clearHandle(const ResourceHeader& resource)
 {
-    _headers.remove_if([&resource](const ResourceHeader& i){return &(resource) == &(i);});
+    for (HeaderPool::Handle i = _headers->getUsedObjects(); i.isValid(); i = i.getNextObject())
+    {
+        auto j = i.getData();
+
+        if (j == &resource)
+            _headers->freeObject(i);
+    }
+    //_headers.remove_if([&resource](const ResourceHeader& i){return &(resource) == &(i);});
 }
 
 ResourceHandle ResourceBuffer::pushHeader(const std::string& name, const ResourceType type,
@@ -159,16 +203,17 @@ ResourceHandle ResourceBuffer::pushHeader(const std::string& name, const Resourc
     if (data == nullptr)
         return ResourceHandle();
 
-    ResourceHeader header;
+    HeaderPool::Handle handle = _headers->createObject();
+    if (!handle.isValid())
+        return ResourceHandle();
 
-    header.gid = hashString(name);
-    header.data = data;
-    header.elements = number;
-    header.marker = marker;
-    header.type = type;
+    auto header = handle.getData();
 
-    _headers.push_front(header);
-    ResourceHeader* bufferedHeader = &(_headers.front());
+    header->gid = hashString(name);
+    header->data = data;
+    header->elements = number;
+    header->marker = marker;
+    header->type = type;
 
-    return ResourceHandle(bufferedHeader, this);
+    return ResourceHandle(header, this);
 }
